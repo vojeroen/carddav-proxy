@@ -11,6 +11,7 @@ from helpers import (
 from interaction import make_downstream_response, proxy_to_upstream
 
 logger = logging.getLogger(__name__)
+
 HTTP_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"]
 WEBDAV_METHODS = [
     "PROPFIND",
@@ -34,6 +35,9 @@ def address_book_listing(path_username):
 
     username, addressbook, upstream_request_headers = process_authorization_header()
 
+    if not addressbook:
+        addressbook = request.cookies.get("carddav_proxy_addressbook")
+
     if username:
         route = f"/remote.php/dav/addressbooks/users/{username}/"
     else:
@@ -44,11 +48,10 @@ def address_book_listing(path_username):
         route=route,
         content=request.data,
         headers=upstream_request_headers,
+        cookies=request.cookies,
     )
 
-    if addressbook is None:
-        downstream_response_content = upstream_response.content
-    else:
+    if addressbook:
         accepted_href = (route, f"{route}{addressbook}/")
 
         xml_response = etree.fromstring(upstream_response.content)
@@ -59,6 +62,8 @@ def address_book_listing(path_username):
                     content=upstream_response.content,
                     status_code=upstream_response.status_code,
                     headers=upstream_response.headers,
+                    cookies=upstream_response.cookies,
+                    addressbook=addressbook,
                 )
             href_node = href_nodes[0]
             if href_node.text not in accepted_href:
@@ -67,11 +72,15 @@ def address_book_listing(path_username):
         downstream_response_content = etree.tostring(
             xml_response, encoding=str
         ).encode()
+    else:
+        downstream_response_content = upstream_response.content
 
     return make_downstream_response(
         content=downstream_response_content,
         status_code=upstream_response.status_code,
         headers=upstream_response.headers,
+        cookies=upstream_response.cookies,
+        addressbook=addressbook,
     )
 
 
@@ -89,12 +98,14 @@ def main(route=""):
         route=route,
         content=request.data,
         headers=upstream_request_headers,
+        cookies=request.cookies,
     )
 
     return make_downstream_response(
         content=upstream_response.content,
         status_code=upstream_response.status_code,
         headers=upstream_response.headers,
+        cookies=upstream_response.cookies,
     )
 
 

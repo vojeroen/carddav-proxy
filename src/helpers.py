@@ -17,7 +17,7 @@ def split_username(username):
     try:
         username, addressbook = username.split("#")
     except ValueError:
-        addressbook = None
+        addressbook = ""
     return username, addressbook
 
 
