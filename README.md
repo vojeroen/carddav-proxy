@@ -21,6 +21,14 @@ separate domain name, e.g. nextcloud-dav.yourdomain.com, using a reverse proxy s
 
 ![proxy setup](img/CardDAV-Proxy.png)
 
+A docker image for CardDAV-Proxy is available on Docker Hub: https://hub.docker.com/r/vojeroen/carddav-proxy. It needs
+the following environment variables:
+
+* `LOG_LEVEL`: set the log level of the application, "INFO" by default. **Warning: when setting to "DEBUG", your
+  credentials will be logged.**
+* `THIS_SERVER`: domain of the CardDAV-Proxy, e.g. "https://nextcloud-dav.yourdomain.com".
+* `UPSTREAM_SERVER`: domain of the CardDAV server, e.g. "https://nextcloud.yourdomain.com".
+
 A very basic server section for nginx looks like this, this should be extended with at least some SSL configuration and
 security headers.
 
@@ -37,13 +45,6 @@ server {
     }
 }
 ```
-
-The CardDAV-Proxy container needs the following environment variables:
-
-* `LOG_LEVEL`: set the log level of the application, "INFO" by default. **Warning: when setting to "DEBUG", your
-  credentials will be logged.**
-* `THIS_SERVER`: domain of the CardDAV-Proxy, e.g. "https://nextcloud-dav.yourdomain.com".
-* `UPSTREAM_SERVER`: domain of the CardDAV server, e.g. "https://nextcloud.yourdomain.com".
 
 ## MacOS account configuration
 
