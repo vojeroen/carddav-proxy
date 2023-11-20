@@ -1,6 +1,6 @@
 import os
 
-LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG").upper()
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 UPSTREAM_SERVER = os.environ.get("UPSTREAM_SERVER")
 THIS_SERVER = os.environ.get("THIS_SERVER")
 STRIP_HEADERS_TO_UPSTREAM = "host"
